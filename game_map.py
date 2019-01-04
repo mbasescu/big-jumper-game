@@ -26,11 +26,11 @@ class GameMap:
 	def get_floor_height(self, x_vec):
 		h = np.zeros(1)
 		x = x_vec[0]
-		if (-100 <= x < 0):
+		if (0 <= x < 1.25):
 			h[0] = 0.1
-		elif (0 <= x < 1.25):
-			h[0] = 0.1
-		elif (1.25 <= x <= 5):
+		elif (1.25 <= x < self.gconv.W*self.gconv.mpp):
 			h[0] = 0.5
+		else: # Big walls on edges of screen
+			h[0] = 40
 
 		return h
