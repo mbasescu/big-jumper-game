@@ -1,6 +1,8 @@
 import pygame
 from pygame.locals import *
 from game_entities import *
+from game_map import *
+from game_conversion_utils import *
 
 # Setup the window
 pygame.init()
@@ -12,7 +14,10 @@ clock = pygame.time.Clock()
 FPS = 60
 dt = 0.01
 
-jumper = Jumper(W, H, [int(W/2), int(H/5)])
+# Initialize game objects
+gconv = GameConversionUtils(W, H, 300)
+game_map = GameMap(gconv, "Temp")
+jumper = Jumper(gconv, [int(W/2), int(H/5)], game_map)
 
 running = True
 
@@ -32,6 +37,7 @@ while running:
 	jumper.update(pressed_keys, dt)
 	
 	# Draw the player
+	game_map.draw_self(screen)
 	jumper.draw_self(screen)
 	
 	# Update the display
