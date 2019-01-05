@@ -42,6 +42,7 @@ class Jumper(pygame.sprite.Sprite):
 		self.m = 2 # Mass (kg)
 		self.g = 40 # Acceleration due to gravity
 		self.lat_accel = 200 # Maximum lateral acceleration
+		self.jump_mult = 0.5 # Additive multiplier on jump force
 		self.s0 = 0.7 # Resting length of spring
 		self.sc = 0.2 # Solid length of spring
 		self.sm = 1.2 # Maximum length of spring
@@ -60,6 +61,9 @@ class Jumper(pygame.sprite.Sprite):
 	def update(self, pressed_keys, dt):
 		has_velocity = False
 		self.a = np.array([0, 0])
+		jump_active = False
+		mult = 1
+
 		# Check for user input
 		if pressed_keys[K_LEFT]:
 			has_velocity = True
@@ -67,6 +71,8 @@ class Jumper(pygame.sprite.Sprite):
 		if pressed_keys[K_RIGHT]:
 			has_velocity = True	
 			self.a[0] = self.lat_accel
+		if pressed_keys[K_SPACE]:
+			jump_active = True
 
 		# Do physics integration
 		spring_force = 0
@@ -75,6 +81,13 @@ class Jumper(pygame.sprite.Sprite):
 		if (self.x[1] - floor_h  < self.s0):
 			self.s = self.x[1] - floor_h
 			spring_force = self.k*(self.s0-self.s)
+			
+			# Apply multiplier to spring force if jumping
+			if jump_active:
+				mult += self.jump_mult
+				print(mult)
+
+			spring_force *= mult
 		else:
 			self.s = self.s0
 
@@ -104,6 +117,9 @@ class Jumper(pygame.sprite.Sprite):
 		if (self.x[1] - floor_h < self.s0):
 			temp_s = self.x[1] - floor_h
 			spring_force = self.k*(self.s0-temp_s)
+		
+			spring_force *= mult
+
 		temp_a = np.array([0, -self.g + spring_force/self.m]) - self.b*self.v
 		self.v = self.v + 0.5*temp_a*dt
 
